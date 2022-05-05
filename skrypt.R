@@ -5,4 +5,14 @@
 #--wczytywanie danych--
 #install.packages("xlsx") - zainstalowany
 library("xlsx")
-my_data <- read.xlsx(dane_gus, 2)
+path <- "d:/dane_gus.xlsx"
+my_data <- read.xlsx(path, 2)
+
+#--obróbka danych--
+#install.packages("mice") - zainstalowany; instaluje także dplyr, ggplot2
+View(my_data)
+#kolumny 8-14 i 27-29 trzeba wypełnić danymi (pakiet mice)
+
+
+
+
