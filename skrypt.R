@@ -36,6 +36,7 @@ bez_wiersza_2$NA..14[bez_wiersza_2$NA..14=="-"]<-'0'
 bez_wiersza_2$NA..27[bez_wiersza_2$NA..27=="-"]<-'0'
 bez_wiersza_2$NA..28[bez_wiersza_2$NA..28=="-"]<-'0'
 bez_wiersza_2$NA..29[bez_wiersza_2$NA..29=="-"]<-'0'
+View(bez_wiersza_2)
 bez_wiersza_2$NA..8[bez_wiersza_2$NA..8=="0"]<-NA
 bez_wiersza_2$NA..9[bez_wiersza_2$NA..9=="0"]<-NA
 bez_wiersza_2$NA..10[bez_wiersza_2$NA..10=="0"]<-NA
@@ -47,10 +48,15 @@ bez_wiersza_2$NA..27[bez_wiersza_2$NA..27=="0"]<-NA
 bez_wiersza_2$NA..28[bez_wiersza_2$NA..28=="0"]<-NA
 bez_wiersza_2$NA..29[bez_wiersza_2$NA..29=="0"]<-NA
 View(bez_wiersza_2)
-#POPRAWIC!
-bez_wiersza_2<-bez_wiersza_2%>%mutate(Nazwa=as.factor(Nazwa))
-bez_wiersza_2<- mice(bez_wiersza_2, m=5, method = 'pmm')
-View(bez_wiersza_2)
+
+#arima
+#POPRAWIC! - zamiana mice na arima (package forecast)
+
+
+#library(mice)
+#mice_tabela<-bez_wiersza_2%>%mutate(Nazwa=as.factor(Nazwa))
+#mice_tabela_2<-mice(mice_tabela, m=5, method = 'pmm')
+#View(mice_tabela_2$data)
 
 #library(mice)
 #imputed_Data.mice <- mice(bez_wiersza_2, m=5, method = 'pmm')
