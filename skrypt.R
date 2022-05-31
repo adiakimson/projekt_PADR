@@ -2,10 +2,12 @@
 #Karolina Joachimczyk, WEiTI
 #Katarzyna Latos, WEiTI
 
+#tymczasowo dane uzupełnione w excelu
+
 #--wczytywanie danych--
 #install.packages("xlsx") - zainstalowany
 library("xlsx")
-path <- "d:/dane_gus.xlsx"
+path <- "D:\\dane_gus_uzupelnione.xlsx"
 my_data <- read.xlsx(path, 2)
 View(my_data)
 
@@ -18,47 +20,14 @@ View(bez_kolumny_lozek_18)
 #usuwamy wiersz drugi
 library(dplyr)
 bez_wiersza_2<-bez_kolumny_lozek_18%>%slice(-c(2))
-View(bez_wiersza_2)
+View(bez_wiersza_2$data)
 
-#--obróbka danych--
-#install.packages("mice") - zainstalowany; instaluje także dplyr, ggplot2
-#kolumny 8-14 i 27-29 trzeba wypełnić danymi (pakiet mice)
-#bez_wiersza_2[is.na(bez_wiersza_2)]<-'0'
-
-#poprawic na lepsze rozwiazanie - najpierw wszedzie zera tam gdzie imputation 
-bez_wiersza_2$NA..8[bez_wiersza_2$NA..8=="-"]<-'0'
-bez_wiersza_2$NA..9[bez_wiersza_2$NA..9=="-"]<-'0'
-bez_wiersza_2$NA..10[bez_wiersza_2$NA..10=="-"]<-'0'
-bez_wiersza_2$NA..11[bez_wiersza_2$NA..11=="-"]<-'0'
-bez_wiersza_2$NA..12[bez_wiersza_2$NA..12=="-"]<-'0'
-bez_wiersza_2$NA..13[bez_wiersza_2$NA..13=="-"]<-'0'
-bez_wiersza_2$NA..14[bez_wiersza_2$NA..14=="-"]<-'0'
-bez_wiersza_2$NA..27[bez_wiersza_2$NA..27=="-"]<-'0'
-bez_wiersza_2$NA..28[bez_wiersza_2$NA..28=="-"]<-'0'
-bez_wiersza_2$NA..29[bez_wiersza_2$NA..29=="-"]<-'0'
-View(bez_wiersza_2)
-bez_wiersza_2$NA..8[bez_wiersza_2$NA..8=="0"]<-NA
-bez_wiersza_2$NA..9[bez_wiersza_2$NA..9=="0"]<-NA
-bez_wiersza_2$NA..10[bez_wiersza_2$NA..10=="0"]<-NA
-bez_wiersza_2$NA..11[bez_wiersza_2$NA..11=="0"]<-NA
-bez_wiersza_2$NA..12[bez_wiersza_2$NA..12=="0"]<-NA
-bez_wiersza_2$NA..13[bez_wiersza_2$NA..13=="0"]<-NA
-bez_wiersza_2$NA..14[bez_wiersza_2$NA..14=="0"]<-NA
-bez_wiersza_2$NA..27[bez_wiersza_2$NA..27=="0"]<-NA
-bez_wiersza_2$NA..28[bez_wiersza_2$NA..28=="0"]<-NA
-bez_wiersza_2$NA..29[bez_wiersza_2$NA..29=="0"]<-NA
-View(bez_wiersza_2)
-
-#arima
-#POPRAWIC! - zamiana mice na arima (package forecast)
-
-
-#library(mice)
-#mice_tabela<-bez_wiersza_2%>%mutate(Nazwa=as.factor(Nazwa))
-#mice_tabela_2<-mice(mice_tabela, m=5, method = 'pmm')
-#View(mice_tabela_2$data)
-
-#library(mice)
-#imputed_Data.mice <- mice(bez_wiersza_2, m=5, method = 'pmm')
-#summary(imputed_Data)
+#--wizualizacja danych--
+#przyklad zależności zgonów od 1 cechy w 1 roku
+library(ggplot2)
+#problem z subset
+przyklad_wiz<-subset(bez_wiersza_2,select=c(20,181))
+wiz1<-ggplot(data = przyklad_wiz, aes(x=leczeni_w_trybie_1_dnia, y=liczba_zgonow))+
+  geom_point(mapping = aes(data=przyklad_wiz, "zaleznosc zgonow od leczonych w trybie 1 dnia"), color = "red")+
+  ggtitle("Wykres zaleznosci zgonow od leczonych w trybie 1 dnia w 2007 roku")
 
