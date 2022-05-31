@@ -6,9 +6,13 @@
 
 #--wczytywanie danych--
 #install.packages("xlsx") - zainstalowany
-library("xlsx")
-path <- "D:\\dane_gus_uzupelnione.xlsx"
-my_data <- read.xlsx(path, 2)
+
+#setwd("C:/Users/DG Inwest/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc/LocalState/rootfs/home/kjoachim/projekt_PADR/projekt_PADR")
+
+getwd()
+library("readxl")
+path <- "D:/dane_gus_uzupelnione.xlsx"
+my_data <- read_excel(path, 2)
 View(my_data)
 
 #--przygtowanie danych
@@ -18,16 +22,16 @@ View(bez_kolumny_1)
 bez_kolumny_lozek_18<-subset(bez_kolumny_1,select=-c(łóżka.dla.dzieci.i.młodzieży.w.wieku.do.18.lat))
 View(bez_kolumny_lozek_18)
 #usuwamy wiersz drugi
-library(dplyr)
+library("dplyr")
 bez_wiersza_2<-bez_kolumny_lozek_18%>%slice(-c(2))
 View(bez_wiersza_2$data)
 
 #--wizualizacja danych--
 #przyklad zależności zgonów od 1 cechy w 1 roku
-library(ggplot2)
+library("ggplot2")
 #problem z subset
 przyklad_wiz<-subset(bez_wiersza_2,select=c(20,181))
-wiz1<-ggplot(data = przyklad_wiz, aes(x=leczeni_w_trybie_1_dnia, y=liczba_zgonow))+
+wiz1$data<-ggplot(data = przyklad_wiz, aes(x=leczeni_w_trybie_1_dnia, y=liczba_zgonow))+
   geom_point(mapping = aes(data=przyklad_wiz, "zaleznosc zgonow od leczonych w trybie 1 dnia"), color = "red")+
   ggtitle("Wykres zaleznosci zgonow od leczonych w trybie 1 dnia w 2007 roku")
 
