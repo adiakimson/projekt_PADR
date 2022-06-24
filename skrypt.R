@@ -13,6 +13,8 @@ path <- "D:/dane_gus_uzupelnione.xlsx"
 my_data <- read_excel(path, 2)
 path1 <- "D:/dane_guss.xlsx"
 View(my_data)
+my_data_s<-read_excel(path1, 1)
+mydata_siec<-subset(my_data_s,select=-c(7:98))
 
 #---------------PRZYGOTOWANIE DANYCH----------------------------
 
@@ -107,10 +109,10 @@ mtext("Liczba pacjentów", side=4)
 #----------------- SIEĆ --------------------------------
 
 library(neuralnet)
-model1=neuralnet(Jedendzien~.~Pobyt,data=mydata_siec, 
-                 hidden=2, err.fct="sse",treshold=0.05,linear.output = TRUE)
-model1$result.matrix
-plot(model1)
+#model1=neuralnet(Jedendzien~.~Pobyt,data=mydata_siec, 
+                 #hidden=2, err.fct="sse",treshold=0.05,linear.output = TRUE)
+#model1$result.matrix
+#plot(model1)
 
 
 #nowa strona https://www.r-bloggers.com/2021/04/deep-neural-network-in-r/
