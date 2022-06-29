@@ -44,15 +44,12 @@ library(ggplot2)
 
 #ŚMIERĆ A ŚREDNIA LICZBA ŁÓŻEK NA PRZESTRZENI LAT W CAŁEJ POLSCE
 smierccc<-subset(bezpacjentow1wiersza, select=-c(1:81))
-#TO NAS INTERESUJE BO KORZYSTAMY CZĘSTO W PRZSZŁOŚCI
 smierc3<-smierccc%>%slice(-c(3:18))
 
-#lata<-smierc3%>%slice(c(1)) #NO WIEKI WIEKÓW AMEN
 danesmierc<-smierc3%>%slice(c(2))
 #data <- data.frame(lata,danesmierc)
 
-wyk0<-plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Osoby ze stwierdzonym zgonem przed podjęciem leczenia \n lub w trakcie na przestrzeni lat")
-
+plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Osoby ze stwierdzonym zgonem przed podjęciem leczenia \n lub w trakcie na przestrzeni lat")
 
 #ŚMIERĆ A LICZBA DNI POBYTU
 
@@ -65,26 +62,26 @@ klinicznie<-subset(bezpacjentow1wiersza, select=-c(1:49,66:97))
 kliniczniewiersz<-klinicznie%>%slice(c(2))
 
 #ŚMIERĆ A 1 DZIEŃ
-wyk1<-plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba osób zmarłych przed podjęciem leczenia \n a liczba pacjentów wyleczonych 1-go dnia")
+plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba osób zmarłych przed podjęciem leczenia \n a liczba pacjentów wyleczonych 1-go dnia")
 par(new=TRUE)
-wyk2<-plot(2006:2021,dzien1wiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
+plot(2006:2021,dzien1wiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
 axis(4)
-mtext("Liczba wyleczonych 1-go dnia", side=4) #NAPRAW ODSTĘP!
+mtext("Liczba wyleczonych 1-go dnia", side=4)
 
 #ŚMIERĆ A LECZENI KLINICZNIE
-wyk3<-plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba osób zmarłych przed podjęciem leczenia \n a liczba pacjentów leczonych klinicznie")
+plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba osób zmarłych przed podjęciem leczenia \n a liczba pacjentów leczonych klinicznie")
 par(new=TRUE)
-wyk4<-plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
+plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
 axis(4)
-mtext("Liczba przyjętych klinicznie", side=4) #NAPRAW ODSTĘP!
+mtext("Liczba przyjętych klinicznie", side=4)
 
 #PORÓWNANIE LECZENIA A ŚMIERĆ
-wyk5<-plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba pacjentów leczonych klinicznie \n oraz liczba osób wyleczonych 1-go dnia \n a liczba zmarłych przed podjęciem leczenia")
+plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba pacjentów leczonych klinicznie \n oraz liczba osób wyleczonych 1-go dnia \n a liczba zmarłych przed podjęciem leczenia")
 par(new=TRUE)
-wyk6<-plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
+plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
 axis(4)
 par(new=TRUE)
-wyk7<-plot(2006:2021,dzien1wiersz,col="blue",pch=20,cex=2,axes=FALSE,ann=FALSE)
+plot(2006:2021,dzien1wiersz,col="blue",pch=20,cex=2,axes=FALSE,ann=FALSE)
 mtext("Liczba pacjentów", side=4)
 
 #----------------- REGRESJA ----------------------------
@@ -186,19 +183,16 @@ confusionMatrix(
 )
 #wyswietlenie
 set.seed(120)  # Setting seed
-as_rf = randomForest(x = train_data,
+Wagi_cech = randomForest(x = train_data,
                              y = train_data$Smierc,
                              ntree = 2000)
-randomForest::varImpPlot(as_rf)
+randomForest::varImpPlot(Wagi_cech)
 
 #----------------- SIEĆ --------------------------------
 
 library(neuralnet)
 
 str(mydata_siec)
-
-library(neuralnet)
-
 data3 <- as.matrix(mydata_siec)
 set.seed(124)
 ind <- sample(2, nrow(data3), replace = T, prob = c(0.7, 0.3))
@@ -226,27 +220,21 @@ n$result.matrix
 output <- compute(n, rep = 1, training)
 head(output$net.result)
 
-p1 <- output$n.result
-pred1 <- ifelse(p1 > 0.5, 1, 0)
-tab1 <- table(pred1, training)
-tab1
-
 #------------------SHINY-----------------------------
 
 library(shiny)
 library(shinythemes)
 
-# Define UI for application that draws a histogram
 ui <- fluidPage(theme = shinytheme("cerulean"),
                 
                 navbarPage("Projekt PADR",
                            
-                           tabPanel("Analiza danych",
+                           tabPanel("Podsumowanie danych",
                                     
                                     # Application title
                                     titlePanel("Przewidywanie liczby zgonów na podstawie wybranych parametrów"),
                                     
-                                    # Sidebar with a slider input for number of bins 
+                                    # Sidebar with a slider input
                                     sidebarLayout(
                                       sidebarPanel(
                                         selectInput("var", "Rozwiń roletkę:", 
@@ -255,7 +243,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                                       "Wykresy" = "plots"))
                                       ),
                                       
-                                      # Show a plot of the generated distribution
+                                      # Show a plot
                                       mainPanel(
                                         plotOutput("regPlot"),
                                         plotOutput("siecPlot"),
@@ -265,43 +253,178 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                     
                                     ),
                            
-                           tabPanel("O projekcie", "Projekt zakłada przewidywanie liczby zgonów w zależności od wybranych cech. Wykorzystane dane pochodzą z GUS. Przygotowały: Katarzyna Latos i Karolina Joachimczyk."
+                           tabPanel("Regresja",
+                                    
+                                    titlePanel("Rezultaty Wykorzystanego modelu rf z parametrem RMSE"),
+                                    
+                                    # Sidebar with a checkbox input
+                                    sidebarLayout(
+                                      sidebarPanel(
+                                        checkboxInput("var1", "Predykcja", TRUE)
+                                                      
+                                      ),
+                                      
+                                      # Show a plot
+                                      mainPanel(
+                                        plotOutput("pred1Plot"),
+                                        
+                                      )
+                                    )
+                                    
+                           ),
+                           
+                           tabPanel("Sieć neuronowa",
+                                    
+                                    titlePanel("Rezultaty wykorzystanej sieci"),
+                                    
+                                    # Sidebar with a slider input
+                                    sidebarLayout(
+                                      sidebarPanel(
+                                        checkboxInput("var2", "Predykcja", TRUE)
+                                        
+                            
+                                      ),
+                                      
+                                      # Show a plot
+                                      mainPanel(
+                                        plotOutput("pred2Plot"),
+                                      )
+                                    )
+                                    
+                           ),
+                           
+                           tabPanel("Wykresy",
+                                    
+                                    titlePanel("Pozostałe wykresy"),
+                                    
+                                    # Sidebar with a slider input
+                                    sidebarLayout(
+                                      sidebarPanel(
+                                        selectInput("var3", "Rozwiń roletkę:", 
+                                                    c("Wykres 1" = "wyk1",
+                                                      "Wykres 2" = "wyk2",
+                                                      "Wykres 3" = "wyk3"))
+                                      ),
+                                      
+                                      # Show a plot
+                                      mainPanel(
+                                        plotOutput("wyk1Plot"),
+                                        plotOutput("wyk2Plot"),
+                                        plotOutput("wyk3Plot")
+                                      )
+                                    )
+                                    
+                           ),
+                           
+                           tabPanel("O projekcie",
+                                    
+                                    titlePanel("O projekcie"),
+                                    
+                                    mainPanel("Projekt zakłada przewidywanie liczby zgonów w zależności od wybranych cech. Wykorzystane dane pochodzą z GUS. Przygotowały: Katarzyna Latos i Karolina Joachimczyk.","Źródło danych: GłóWny Urząd Statystyczny - https://bdl.stat.gov.pl/bdl/dane/podgrup/tablica")
                                     
                                     )
                            )
                 
-               
-)
+)                       
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
   
   output$regPlot <- renderPlot({
     
-    #if(input$var=="Regresja")
-      
+    if(input$var=="reg")
+    {
       #regresja
-      randomForest::varImpPlot(as_rf)
+      randomForest::varImpPlot(Wagi_cech)
+    }
+      
   })
   
   output$siecPlot <- renderPlot({
     
-    #if(input$var=="Sieć")
-      
+    if(input$var=="net")
+    {
       #sieć
       plot(n,col.hidden = 'darkgreen',     
            col.hidden.synapse = 'darkgreen',
            show.weights = F,
            information = F,
            fill = 'lightblue')
+    }
+      
   })
   
   output$wykPlot <- renderPlot({
         
-        #if(input$var=="Wykresy")
-          
+        if(input$var=="plots")
+        {
           #wykresy
-          plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Osoby ze stwierdzonym zgonem przed podjęciem leczenia \n lub w trakcie na przestrzeni lat")
+          plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba pacjentów leczonych klinicznie \n oraz liczba osób wyleczonych 1-go dnia \n a liczba zmarłych przed podjęciem leczenia")
+          par(new=TRUE)
+          plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
+          axis(4)
+          par(new=TRUE)
+          plot(2006:2021,dzien1wiersz,col="blue",pch=20,cex=2,axes=FALSE,ann=FALSE)
+          mtext("Liczba pacjentów", side=4)
+        }
+    
+  })
+  
+  output$pred1Plot <- renderPlot({
+    
+    if(input$var1==TRUE)
+    {
+      #regresja
+      plot(1:16,smierc_vec,col="red",xlab = "Numer województwa", ylab = "Liczba zgonów",pch=20,cex=2, main="Predykowane zgony dla kolejnych numerów województw")
+    }
+    
+  })
+  
+  output$pred2Plot <- renderPlot({
+    
+    if(input$var2==TRUE)
+    {
+      #sieć
+      plot(1:16,n$response,col="blue",xlab = "Numer województwa", ylab = "Liczba zgonów",pch=20,cex=2, main="Predykowane zgony dla kolejnych numerów województw")
+    }
+    
+  })
+  
+  output$wyk1Plot <- renderPlot({
+    
+    if(input$var3=="wyk1")
+    {
+      #wyk1
+      plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Osoby ze stwierdzonym zgonem przed podjęciem leczenia \n lub w trakcie na przestrzeni lat")
+    }
+    
+  })
+  
+  output$wyk2Plot <- renderPlot({
+    
+    if(input$var3=="wyk2")
+    {
+      #wyk2
+      plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba osób zmarłych przed podjęciem leczenia \n a liczba pacjentów leczonych klinicznie")
+      par(new=TRUE)
+      plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
+      axis(4)
+      mtext("Liczba przyjętych klinicznie", side=4)
+    }
+    
+  })
+  
+  output$wyk3Plot <- renderPlot({
+    
+    if(input$var3=="wyk3")
+    {
+      #wyk3
+      plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba osób zmarłych przed podjęciem leczenia \n a liczba pacjentów wyleczonych 1-go dnia")
+      par(new=TRUE)
+      plot(2006:2021,dzien1wiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
+      axis(4)
+      mtext("Liczba wyleczonych 1-go dnia", side=4)
+    }
+    
   })
   
 }
