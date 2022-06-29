@@ -7,7 +7,7 @@
 #------------WCZYTYWANIE DANYCH----------
 
 getwd()
-library("readxl")
+library(readxl)
 path <- "C:/dane_gus_uzupelnione.xlsx"
 my_data <- read_excel(path, 2)
 path1 <- "C:/dane_guss.xlsx"
@@ -45,9 +45,7 @@ library(ggplot2)
 #ŚMIERĆ A ŚREDNIA LICZBA ŁÓŻEK NA PRZESTRZENI LAT W CAŁEJ POLSCE
 smierccc<-subset(bezpacjentow1wiersza, select=-c(1:81))
 smierc3<-smierccc%>%slice(-c(3:18))
-
 danesmierc<-smierc3%>%slice(c(2))
-#data <- data.frame(lata,danesmierc)
 
 plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Osoby ze stwierdzonym zgonem przed podjęciem leczenia \n lub w trakcie na przestrzeni lat")
 
