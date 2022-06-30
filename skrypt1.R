@@ -86,103 +86,29 @@ library(readxl)
 r2006<-read_excel(path1,1)
 r2006<-subset(r2006,select=c(1:6))
 r2007<-read_excel(path1,2)
-
-library(forecast)
-library(caret)
-library(e1071)
-library(randomForest)
-#przewidywanie na podst sredniej
 test_data<-r2006
 train_data<-r2007
-#tworzenie i testowanie modelu
-set.seed(1234)
-trControl <- trainControl(method = "cv",
-                          number = 10,
-                          search = "grid")
-rf_default <- train(Smierc~.,train_data,"rf",
-                    metric = "RMSE",
-                    trControl = trControl)
-print(rf_default)
-rf_default$results
-#best mtry
-set.seed(1234)
-tuneGrid <- expand.grid(.mtry = c(1: 10))
-rf_mtry <- train(Smierc~.,
-                 data = train_data,
-                 method = "rf",
-                 metric = "RMSE",
-                 tuneGrid = tuneGrid,
-                 trControl = trControl,
-                 importance = TRUE,
-                 nodesize = 14,
-                 ntree = 300)
-print(rf_mtry)
-best_mtry<-rf_mtry$bestTune$mtry
-max_mtry<-max(rf_mtry$results$RMSE)
-#best maxnodes
-store_maxnode <- list()
-tuneGrid <- expand.grid(.mtry = best_mtry)
-for (maxnodes in c(5: 15)) {
-  set.seed(1234)
-  rf_maxnode <- train(Smierc~.,
-                      data = train_data,
-                      method = "rf",
-                      metric = "RMSE",
-                      tuneGrid = tuneGrid,
-                      trControl = trControl,
-                      importance = TRUE,
-                      nodesize = 14,
-                      maxnodes = maxnodes,
-                      ntree = 300)
-  current_iteration <- toString(maxnodes)
-  store_maxnode[[current_iteration]] <- rf_maxnode
-}
-results_mtry <- resamples(store_maxnode)
-summary(results_mtry)
-#best ntrees
-store_maxtrees <- list()
-for (ntree in c(250, 300, 350, 400, 450, 500, 550, 600, 800, 1000, 2000)) {
-  set.seed(5678)
-  rf_maxtrees <- train(Smierc~.,
-                       data = train_data,
-                       method = "rf",
-                       metric = "RMSE",
-                       tuneGrid = tuneGrid,
-                       trControl = trControl,
-                       importance = TRUE,
-                       nodesize = 14,
-                       maxnodes = 24,
-                       ntree = ntree)
-  key <- toString(ntree)
-  store_maxtrees[[key]] <- rf_maxtrees
-}
-results_tree <- resamples(store_maxtrees)
-summary(results_tree)
-#best parameters
-fit_rf <- train(Smierc~.,
-                train_data,
-                method = "rf",
-                metric = "RMSE",
-                tuneGrid = tuneGrid,
-                trControl = trControl,
-                importance = TRUE,
-                nodesize = 14,
-                ntree = 2000,
-                maxnodes = 15)
-#prediction
-prediction <-predict(fit_rf, test_data)
-#confusion matrix
-smierc_vec<-as.numeric(unlist(test_data$Smierc))
-confusionMatrix(
-  factor(prediction, levels = 1:16),
-  factor(smierc_vec, levels=1:16)
-)
-#wyswietlenie
-set.seed(120)  # Setting seed
-Wagi_cech = randomForest(x = train_data,
-                             y = train_data$Smierc,
-                             ntree = 2000)
-randomForest::varImpPlot(Wagi_cech)
+
+head(r2006)
+
+r2006.lm<-lm(Smierc~Jedendzien+Srednielozka+Leczeniogolem+Szpitalne+Pobyt, data=r2006)
+summary(r2006.lm)
+
+names(r2006.lm)
+summary(r2006.lm$coefficients)
+
+r2006$Smierc.lm<-abs(r2006.lm$fitted.values)
+
+plot(x = r2006$Smierc,                          
+     y = abs(r2006.lm$fitted.values),               
+     xlab = "True Values",
+     ylab = "Model Fitted Values",
+     main = "Regression fits of number of deaths")
+
+r2006.new<-data.frame(r2007)
+
+predreg<-predict(object = r2006.lm,     
+        newdata = r2006.new) 
 
 #----------------- SIEĆ --------------------------------
 
@@ -247,7 +173,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                       )
                                     )
                                     
-                                    ),
+                           ),
                            
                            tabPanel("Regresja",
                                     
@@ -257,7 +183,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                     sidebarLayout(
                                       sidebarPanel(
                                         checkboxInput("var1", "Predykcja", TRUE)
-                                                      
+                                        
                                       ),
                                       
                                       # Show a plot
@@ -278,7 +204,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                       sidebarPanel(
                                         checkboxInput("var2", "Predykcja", TRUE)
                                         
-                            
+                                        
                                       ),
                                       
                                       # Show a plot
@@ -318,8 +244,8 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                     
                                     mainPanel("Projekt zakłada przewidywanie liczby zgonów w zależności od wybranych cech. Wykorzystane dane pochodzą z GUS. Przygotowały: Katarzyna Latos i Karolina Joachimczyk.","Źródło danych: GłóWny Urząd Statystyczny - https://bdl.stat.gov.pl/bdl/dane/podgrup/tablica")
                                     
-                                    )
                            )
+                )
                 
 )                       
 
@@ -330,9 +256,13 @@ server <- function(input, output) {
     if(input$var=="reg")
     {
       #regresja
-      randomForest::varImpPlot(Wagi_cech)
+      plot(x = r2006$Smierc,                        
+           y = r2006.lm$fitted.values,               
+           xlab = "Prawdziwe wartości",
+           ylab = "Wartości wg. modelu",
+           main = "Regresja")
     }
-      
+    
   })
   
   output$siecPlot <- renderPlot({
@@ -346,22 +276,22 @@ server <- function(input, output) {
            information = F,
            fill = 'lightblue')
     }
-      
+    
   })
   
   output$wykPlot <- renderPlot({
-        
-        if(input$var=="plots")
-        {
-          #wykresy
-          plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba pacjentów leczonych klinicznie \n oraz liczba osób wyleczonych 1-go dnia \n a liczba zmarłych przed podjęciem leczenia")
-          par(new=TRUE)
-          plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
-          axis(4)
-          par(new=TRUE)
-          plot(2006:2021,dzien1wiersz,col="blue",pch=20,cex=2,axes=FALSE,ann=FALSE)
-          mtext("Liczba pacjentów", side=4)
-        }
+    
+    if(input$var=="plots")
+    {
+      #wykresy
+      plot(2006:2021,danesmierc,col="red",xlab = "Lata", ylab = "Liczba zgonów",pch=20,cex=2, main="Liczba pacjentów leczonych klinicznie \n oraz liczba osób wyleczonych 1-go dnia \n a liczba zmarłych przed podjęciem leczenia")
+      par(new=TRUE)
+      plot(2006:2021,kliniczniewiersz,col="green",pch=20,cex=2,axes=FALSE,ann=FALSE)
+      axis(4)
+      par(new=TRUE)
+      plot(2006:2021,dzien1wiersz,col="blue",pch=20,cex=2,axes=FALSE,ann=FALSE)
+      mtext("Liczba pacjentów", side=4)
+    }
     
   })
   
@@ -370,7 +300,7 @@ server <- function(input, output) {
     if(input$var1==TRUE)
     {
       #regresja
-      plot(1:16,smierc_vec,col="red",xlab = "Numer województwa", ylab = "Liczba zgonów",pch=20,cex=2, main="Predykowane zgony dla kolejnych numerów województw")
+      plot(1:16,predreg,col="red",xlab = "Numer województwa", ylab = "Liczba zgonów",pch=20,cex=2, main="Predykowane zgony dla kolejnych numerów województw")
     }
     
   })
@@ -380,7 +310,7 @@ server <- function(input, output) {
     if(input$var2==TRUE)
     {
       #sieć
-      plot(1:16,n$response,col="blue",xlab = "Numer województwa", ylab = "Liczba zgonów",pch=20,cex=2, main="Predykowane zgony dla kolejnych numerów województw")
+      plot(1:16,n$response,col="blue",xlab = "Numer województwa", ylab = "Liczba zgonów",pch=20,las=2,cex.names=0.7,cex=2, main="Predykowane zgony dla kolejnych numerów województw")
     }
     
   })
